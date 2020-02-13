@@ -28,7 +28,7 @@ end
 -- updates the menu
 function menu:update(dt)
 	clicksound:setVolume(volume)
-	if menutrack[currentTrack1]:isStopped() then
+	if not menutrack[currentTrack1]:isPlaying() then
 		if currentTrack1 < #menutrack then
 			currentTrack1 = currentTrack1+1
 		elseif currentTrack1 == #menutrack then

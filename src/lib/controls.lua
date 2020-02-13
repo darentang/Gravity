@@ -104,6 +104,7 @@ end
 
 function gameMenuControl(x,y,button)
 	-- called when the menu is active
+
 	if button ==  "l" then
 		mouse.l = true
 		mouse.downl = {mX,mY}
@@ -111,22 +112,42 @@ function gameMenuControl(x,y,button)
 end
 
 function love.mousepressed(x, y, button)
+	key_map = {
+		[1] = "l",
+		[2] = "r",
+	}
 	--calls the two functions when either is active
 	if level~= nil and level > 0 then
-		gameMouseControl(x,y,button)
+		gameMouseControl(x,y,key_map[button])
 	else
-		gameMenuControl(x,y,button)
+		gameMenuControl(x,y,key_map[button])
 	end
 end
 
 function love.mousereleased(x, y, button)
 	-- disable click variables once the mouse is released
 	if level ~= nil and level > 0 then
-		if button == "l" then mouse.l = false mouse.ld = false drag.active = false mouse.downl = {0,0} drag.node = false end
-		if button == "r" then mouse.r = false end
+		if button == 1 then mouse.l = false mouse.ld = false drag.active = false mouse.downl = {0,0} drag.node = false end
+		if button == 2 then mouse.r = false end
 	else
 		mouse.l = false
 	end
+end
+
+function love.wheelmoved(x,y)
+	if y > 0 then
+		dir = "wu"
+	elseif y < 0 then
+		dir = "wd"
+	end
+
+	--calls the two functions when either is active
+	if level~= nil and level > 0 then
+		gameMouseControl(0,0,dir)
+	else
+		gameMenuControl(0,0,dir)
+	end
+
 end
 
 function love.keypressed(key)
@@ -247,7 +268,7 @@ function keyboard(dt)
 			active.orientationV = (active.torque/active.I)*dt + active.orientationV -- calculates the angular velocity (angular acceleration = toruque/moment of inertia)
 			local thurst = 0 
 			if active.fuelmass > 0 then -- burns if current fuel is positive
-				if engine:isStopped() then engine:play() end
+				if not engine:isPlaying() then engine:play() end
 				thrust = (active.throttle/100)*active.engine.thrust
 				local masschange = (active.engine.thrust/(9.81*active.engine.Isp))*(active.throttle/100)
 				active.fuelmass = active.fuelmass-dt*masschange -- calculate the mass of the fuel after burn
@@ -268,7 +289,7 @@ function keyboard(dt)
 			-- active.orientation = active.orientation+ 0.5*(active.torque/active.I)*dt^2 + active.orientationV*dt
 
 			-- staging 
-			if love.keyboard.isDown(" ") and active.stage ~= nil and table.getn(active.stage) > 1 then
+			if love.keyboard.isDown("space") and active.stage ~= nil and table.getn(active.stage) > 1 then
 				-- creates new object once it is staged
 				body[active.stage[2].name] = deepcopy(active.stage[2]) 
 				body[active.stage[2].name].parent = active.parent

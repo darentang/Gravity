@@ -60,7 +60,7 @@ function game:load(level)
 end
 
 function game:update(dt)
-	if track[currentTrack]:isStopped() then -- switches to next track if current is finished playing
+	if not track[currentTrack]:isPlaying() then -- switches to next track if current is finished playing
 		if currentTrack < #track then
 			currentTrack = currentTrack + 1
 		elseif currentTrack == #track then
